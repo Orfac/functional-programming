@@ -6,10 +6,8 @@ isPrime(2) -> true;
 isPrime(N) -> isPrime(N, 2, N div 2).
 
 isPrime(_, Divider, MaxDivider) when (Divider > MaxDivider) -> true;
-isPrime(N, Divider, MaxDivider) ->
-   if (N rem Divider == 0) -> false;
-   true -> isPrime(N, Divider + 1, MaxDivider)
-   end.
+isPrime(N, Divider, _) when (N rem Divider == 0) -> false;
+isPrime(N, Divider, MaxDivider) -> isPrime(N, Divider + 1, MaxDivider).
 
 for(I,Count,N) -> 
    case (isPrime(I)) of
