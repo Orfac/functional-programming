@@ -19,10 +19,14 @@ getPrime(I,Count,N) ->
    false -> getPrime(I + 1, Count, N)
    end.
 
-getPrime(N) -> getPrime(1, 0, N).
+getPrime(N) ->
+   getPrime(1, 0, N).
 
 start() -> 
-   io:fwrite(integer_to_list(getPrime(10001))),
+   StartList=lists:seq(1, getPrime(10001)),
+   FilteredList=lists:filter(fun(X) -> isPrime(X) end, StartList),
+   FoldedValue=lists:foldl(fun(X, _) -> X end, 0, FilteredList),
+   io:fwrite(integer_to_list(FoldedValue)),
    io:fwrite("~n").
 
 
