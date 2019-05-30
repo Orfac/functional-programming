@@ -23,7 +23,7 @@ getPrime(N) -> getPrime(1, 0, N).
 
 start() -> 
    StartList=lists:seq(1, getPrime(10001)),
-   FilteredList=lists:filter(fun(X) -> isPrime(X) end, StartList),
+   FilteredList=lists:filter(isPrime/1, StartList),
    FoldedValue=lists:foldl(fun(X, _) -> X end, 0, FilteredList),
    io:fwrite(integer_to_list(FoldedValue)),
    io:fwrite("~n").

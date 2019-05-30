@@ -1,5 +1,5 @@
 -module(main).  
--export([getPrime/3,getPrime/1,isPrime/1,isPrime/3,start/0]). 
+-export([getPrime/3,isPrime/1,isPrime/3,start/0]). 
 
 isPrime(1) -> false;
 isPrime(2) -> true;
@@ -19,14 +19,11 @@ getPrime(I,Count,N) ->
    false -> getPrime(I + 1, Count, N)
    end.
 
-getPrime(N) ->
-   getPrime(1, 0, N).
+getPrime(N) -> getPrime(1, 0, N).
 
 start() -> 
-   StartList=lists:seq(1, getPrime(10001)),
-   FilteredList=lists:filter(fun(X) -> isPrime(X) end, StartList),
+   StartList=lists:seq(1, getPrime(100)),
+   FilteredList=lists:filter(fun isPrime/1, StartList),
    FoldedValue=lists:foldl(fun(X, _) -> X end, 0, FilteredList),
    io:fwrite(integer_to_list(FoldedValue)),
    io:fwrite("~n").
-
-
