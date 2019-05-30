@@ -1,9 +1,22 @@
 -module(main). 
 -export([start/0,create_dgraph/2,create_edge/2,
-add_edge/2,delete_edge/2,vertexes/1,edges/1,from/1,to/1, get_another_vertex/2]). 
+add_edge/2,delete_edge/2,vertexes/1,edges/1,from/1,to/1, get_another_vertex/2, sort/1]). 
+
+-include_lib("proper/include/proper.hrl").
+
+
 
 -record(edge, {from, to}).
 -record(dgraph, {vertexes, edges}).
+sort([]) -> [];
+sort([P|Xs]) ->
+    sort([X || X <- Xs, X < P]) ++ [P] ++ sort([X || X <- Xs, P < X]).
+prop_ordered() ->
+    ?FORALL(L, integer(), ordered(sort(L))).
+
+ordered([]) -> true;
+ordered([_]) -> true;
+ordered([A,B|T]) -> A =< B andalso ordered([B|T]).
 
 from(Edge) -> Edge#edge.from.
 to(Edge) -> Edge#edge.to.
@@ -25,7 +38,7 @@ add_edge(Edge, DGraph)->
       false -> DGraph
    end.
 
-delete_edge(Edge, DGraph)->
+delete_edge(Edge, DGraph)-> 
    OldEdges = edges(DGraph),
    NewEdges = lists:delete(Edge,OldEdges),
    case NewEdges of
@@ -52,11 +65,12 @@ filter_by_vertex(Vertex, DGraph) ->
    create_dgraph(NewVertexes, NewEdges).
 
 
-
 print_int(Number) ->
    io:fwrite(integer_to_list(Number)).
 
 start() -> 
    Edge = create_edge(1,5), 
+   proper:quickcheck(main:prop_ordered()),
+   
    print_int(Edge#edge.to),
    io:fwrite("~n").
