@@ -13,14 +13,14 @@ create_test_dgraph(X) ->
     create_dgraph(Vertexes,Edges).
 
 left_merge_equals_to_right_merge_test() ->
-    Dgraph1 = generate_random_dgraph(4),
-    Dgraph2 = generate_random_dgraph(4),
+    Dgraph1 = create_test_dgraph(4),
+    Dgraph2 = create_test_dgraph(4),
     Dgraph3 = merge_dgraphs(Dgraph1,Dgraph2),
     Dgraph4 = merge_dgraphs(Dgraph2,Dgraph1),
     ?assert(Dgraph3 =:= Dgraph4).
 
 empty_dgraph_dont_change_dgraph_after_merge_test() ->
-    Dgraph1 = generate_random_dgraph(5),
+    Dgraph1 = create_test_dgraph(5),
     Dgraph2 = merge_dgraphs(Dgraph1, empty_dgraph()),
     ?assert(Dgraph1 =:= Dgraph2).
 
