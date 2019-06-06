@@ -6,8 +6,6 @@
    merge_dgraphs/2,merge_vertexes/4,merge_vertexes/2, merge_edges/4, merge_edges/2,
    print_dgraph/1, print_edge/1]). 
 
--include_lib("proper/include/proper.hrl").
-
 -record(edge, {from, to}).
 -record(dgraph, {vertexes, edges}).
 

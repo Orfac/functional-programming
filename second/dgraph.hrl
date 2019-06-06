@@ -1,0 +1,2 @@
+-record(edge, {from, to}).
+-record(dgraph, {vertexes, edges}).
