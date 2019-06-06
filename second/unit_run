@@ -1,0 +1,3 @@
+erlc dgraph.erl
+erlc unit.erl
+erl -noshell -s unit start -s init stop
