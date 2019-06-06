@@ -7,7 +7,6 @@
          merging_empty_dgraph_with_dgraph_returns_same_dgraph/0,
          merging_dgraph_with_empty_dgraph_returns_same_dgraph/0,
          merging_dgraphs_is_associative/0]). 
--include("dgraph.hrl").
 
 -include_lib("proper/include/proper.hrl").
 
