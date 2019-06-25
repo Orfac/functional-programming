@@ -40,7 +40,6 @@ equality_of_left_and_right_merges_test() ->
 left_fold_works_test() ->
     Dgraph = create_test_dgraph(4),
     Sum = foldl(fun(X, Acc) -> X + Acc end, 0, Dgraph),
-    io:fwrite(integer_to_list(Sum)),
     ?assert(Sum =:= 10).
 
 right_fold_works_test() ->
