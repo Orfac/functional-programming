@@ -11,11 +11,14 @@
 -include_lib("proper/include/proper.hrl").
 
 generate_random_dgraph() ->
-    Vertexes = [rand:uniform(10) 
-            || _ <- lists:seq(1, 10)],
-    Edges = [create_edge(rand:uniform(10), rand:uniform(10))
-            || _ <- lists:seq(1, 10)],
-    create_dgraph(Vertexes,Edges).
+   Vertexes = [ X || X <- lists:seq(1, rand:uniform(10))],
+   Dgraph = create_dgraph(Vertexes, []),
+   lists:foldr(
+      fun(X, Acc) ->
+         Edge = create_edge(X,rand:uniform(10)),
+         add_edge(Edge, Acc) end,
+      Dgraph,
+      Vertexes).
 
 merging_empty_dgraph_with_dgraph_returns_same_dgraph() ->
    ?FORALL(
@@ -35,7 +38,7 @@ check_associative_addition(Dgraph) ->
    Dgraph2 = generate_random_dgraph(),
    Dgraph3 = generate_random_dgraph(),
    ResultDgraph1 = merge_dgraphs(merge_dgraphs(Dgraph,Dgraph2),Dgraph3),
-   ResultDgraph2 = merge_dgraphs(merge_dgraphs(Dgraph2,Dgraph3),Dgraph),
+   ResultDgraph2 = merge_dgraphs(Dgraph,merge_dgraphs(Dgraph2,Dgraph3)),
    ResultDgraph1 =:= ResultDgraph2.
 
 merging_dgraphs_is_associative() ->
