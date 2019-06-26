@@ -3,7 +3,7 @@
    create_dgraph/2, create_edge/2, empty_dgraph/0,
    from/1, to/1, vertexes/1, edges/1, get_another_vertex/2,
    add_edge/2,delete_edge/2,
-   merge_dgraphs/2, compare_edges/2,
+   merge_dgraphs/2, 
    foldl/3,foldr/3, filter_by_vertex/2,
    print_dgraph/1, print_edge/1]). 
 
@@ -24,33 +24,30 @@ create_dgraph(Vertexes,Edges) ->
 empty_dgraph() ->
     #dgraph{vertexes = [], edges = []}.
 
-compare_edges(A, B) ->
-    case A#edge.from == B#edge.from of
-        true ->
-            A#edge.to > B#edge.to;
-        _ ->
-            A#edge.from > B#edge.from
-    end.
-   
-
+merge_dgraphs(Graph1, Graph2) when Graph1 =:= Graph2 -> Graph1;
 merge_dgraphs(Graph1, Graph2) ->
-   Vertexes = merge_vertexes(Graph1#dgraph.vertexes,Graph2#dgraph.vertexes),
-   Edges = merge_edges(Graph1#dgraph.edges,Graph2#dgraph.edges),
+   Vertexes = merge_vertexes(vertexes(Graph1), vertexes(Graph2)),
+   Edges = merge_edges(edges(Graph1),edges(Graph2)),
    create_dgraph(Vertexes,Edges).
 
 merge_vertexes([], Vertexes2) -> Vertexes2;
 merge_vertexes(Vertexes1, []) -> Vertexes1;
 merge_vertexes(Vertexes1, Vertexes2) ->
-   lists:sort(lists:append(Vertexes1,Vertexes2)).
+   lists:append(
+      Vertexes1, 
+      lists:dropwhile(fun(X) -> lists:member(X,Vertexes1) end,Vertexes2)).
 
 merge_edges([], Edges2) -> Edges2;
 merge_edges(Edges1, []) -> Edges1;
 merge_edges(Edges1, Edges2) ->
-   lists:sort(fun compare_edges/2,lists:append(Edges1,Edges2)).
-   
+   lists:append(
+      Edges1, 
+      lists:dropwhile(fun(X) -> lists:member(X,Edges1) end,Edges2)).
+
 add_edge(Edge, DGraph)->
    case (lists:member(from(Edge),vertexes(DGraph)) 
-   and lists:member(to(Edge),vertexes(DGraph))) of 
+   and lists:member(to(Edge),vertexes(DGraph))
+   and not(lists:member(Edge,edges(DGraph)))) of 
       true ->
          NewEdges = lists:append([Edge], edges(DGraph)),
          create_dgraph(vertexes(DGraph),NewEdges);
@@ -67,57 +64,53 @@ delete_edge(Edge, DGraph)->
          delete_edge(Edge,NewDGraph)
    end.
 
-get_another_vertex(Vertex, Edge) ->
-   case from(Edge) of 
-         Vertex -> to(Edge);
-         AnotherVertex -> AnotherVertex
-   end.
+get_another_vertex(Vertex, Edge) when Edge#edge.to =:= Vertex -> from(Edge);
+get_another_vertex(_, Edge) -> to(Edge).
 
-filter_by_vertex(Vertex, DGraph) ->
-   NewEdges = lists:filter(
+filter_by_vertex(_, DGraph) when (DGraph#dgraph.vertexes =:= []) -> DGraph;
+filter_by_vertex(Fun, DGraph) ->
+   Vertexes = lists:filter(Fun, vertexes(DGraph)),
+   Edges = lists:filter(
       fun (Edge) -> 
-      (from(Edge) =:= Vertex) 
-      or (to(Edge) =:= Vertex) end,
+      (lists:member(from(Edge), Vertexes)) 
+      or (lists:member(to(Edge), Vertexes)) end,
       edges(DGraph)),
-   NewVertexes = lists:map(
-      fun (Edge) -> get_another_vertex(Vertex, Edge) end,
-      NewEdges),
-   create_dgraph(NewVertexes, NewEdges).
+   create_dgraph(Vertexes, Edges).
 
+foldl(_, Acc, DGraph) when (DGraph#dgraph.vertexes =:= []) -> Acc;
+foldl(Fun, Acc, DGraph) when (length(DGraph#dgraph.vertexes) =:= 1) ->
+   Vertex = lists:nth(1,vertexes(DGraph)),
+   Fun(Vertex,Acc);
 foldl(Fun, Acc, DGraph) ->
    [Vertex | Vertexes] = vertexes(DGraph),
-   case Vertexes of
-      [] -> Fun(Vertex, Acc);
-      _ -> 
-         NewDGraph = create_dgraph(Vertexes, edges(DGraph)),
-         foldl(Fun,Fun(Vertex,Acc),NewDGraph)
-   end.
+   NewDGraph = create_dgraph(Vertexes, edges(DGraph)),
+   foldl(Fun,Fun(Vertex,Acc),NewDGraph).
 
+foldr(_, Acc, DGraph) when (DGraph#dgraph.vertexes =:= []) -> Acc;
+foldr(Fun, Acc, DGraph) when (length(DGraph#dgraph.vertexes) =:= 1) ->
+   Vertex = lists:nth(1,vertexes(DGraph)),
+   Fun(Vertex,Acc);
 foldr(Fun, Acc, DGraph) ->
-   [Vertex | Vertexes] = DGraph#dgraph.vertexes,
-   case Vertexes of
-      [] -> Fun(Vertex, Acc);
-      _ -> 
-         NewDGraph = create_dgraph(Vertexes, DGraph#dgraph.edges ),
-         Fun(Vertex, foldr(Fun, Acc, NewDGraph))
-   end.
+   [Vertex | Vertexes] = vertexes(DGraph),
+   NewDGraph = create_dgraph(Vertexes, edges(DGraph) ),
+   Fun(Vertex, foldr(Fun, Acc, NewDGraph)).
 
 print_edge(Edge) ->
    io:fwrite("From "),
-   io:fwrite(integer_to_list(Edge#edge.from)),
+   io:fwrite(integer_to_list(from(Edge))),
    io:fwrite(" To "),
-   io:fwrite(integer_to_list(Edge#edge.to)).
+   io:fwrite(integer_to_list(to(Edge))).
 
 print_dgraph(DGraph) ->
    io:fwrite("Vertexes of dgraph~n"),
    lists:foreach(fun(Vertex) -> 
       io:fwrite(integer_to_list(Vertex)),
       io:fwrite(" ")end,
-      DGraph#dgraph.vertexes),
+      vertexes(DGraph)),
    io:fwrite("~n"),
     io:fwrite("Edges of dgraph~n"),
    lists:foreach(fun(Edge) -> 
       print_edge(Edge),
       io:fwrite("~n")end,
-      DGraph#dgraph.edges),
+      edges(DGraph)),
    io:fwrite("~n").
