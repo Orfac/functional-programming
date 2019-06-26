@@ -5,6 +5,7 @@
    add_edge/2,delete_edge/2,
    merge_dgraphs/2, 
    foldl/3,foldr/3, filter_by_vertex/2,
+   add_vertex/2,
    print_dgraph/1, print_edge/1]). 
 
 -record(edge, {from, to}).
@@ -43,6 +44,14 @@ merge_edges(Edges1, Edges2) ->
    lists:append(
       Edges1, 
       lists:dropwhile(fun(X) -> lists:member(X,Edges1) end,Edges2)).
+
+add_vertex(Vertex, DGraph) ->
+   case (lists:member(Vertex,vertexes(DGraph))) of
+      true -> DGraph;
+      false -> create_dgraph(
+         lists:append(vertexes(DGraph), Vertex), 
+         edges(DGraph))
+   end.
 
 add_edge(Edge, DGraph)->
    case (lists:member(from(Edge),vertexes(DGraph)) 

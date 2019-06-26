@@ -1,6 +1,6 @@
 -module(prop). 
 -import(dgraph,[create_dgraph/2, create_edge/2, empty_dgraph/0,
-   from/1, to/1, vertexes/1, edges/1, get_another_vertex/2,
+   from/1, to/1, vertexes/1, edges/1, get_another_vertex/2, add_vertex/2,
    add_edge/2,delete_edge/2,merge_dgraphs/2, compare_edges/2,
     print_dgraph/1, print_edge/1]).
 -export([start/0, generate_random_dgraph/0,
@@ -35,11 +35,22 @@ merging_dgraph_with_empty_dgraph_returns_same_dgraph() ->
    ).
 
 check_associative_addition(Dgraph) ->
+   
    Dgraph2 = generate_random_dgraph(),
    Dgraph3 = generate_random_dgraph(),
    ResultDgraph1 = merge_dgraphs(merge_dgraphs(Dgraph,Dgraph2),Dgraph3),
    ResultDgraph2 = merge_dgraphs(Dgraph,merge_dgraphs(Dgraph2,Dgraph3)),
-   ResultDgraph1 =:= ResultDgraph2.
+  
+   if (ResultDgraph1 =:= ResultDgraph2) -> true;
+      true -> 
+          io:format("~n NEW"),
+      print_dgraph(Dgraph),
+      print_dgraph(Dgraph2),
+      print_dgraph(Dgraph3),
+      print_dgraph(ResultDgraph1),
+      print_dgraph(ResultDgraph2),
+      ResultDgraph1 =:= ResultDgraph2
+   end.  
 
 merging_dgraphs_is_associative() ->
    ?FORALL(
