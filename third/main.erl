@@ -1,6 +1,7 @@
 -module(main). 
--export([main/1, listen_interpolater/0, listen_reciever/0]).
--import(interpolation,[interpolate/2, create_point/2]).
+-export([main/1]).
+-import(point, [x/1, y/1, create_point/2, str_to_point/1, str_to_ordinate/1]).
+-import(interpolation,[interpolate/2]).
 
 listen_interpolater() ->
    receive
@@ -26,36 +27,29 @@ listen_reciever() ->
          listen_reciever()
    end.
 
-str_to_float(Str) ->
-    try float(list_to_integer(Str))
-    catch error:_ -> list_to_float(Str)
-    end. 
 
-fill_point(Points, Pids) ->
+get_y(Points, Pids) ->
    Line = io:get_line(""),
    if 
       (Line =:= "stop\n") -> ok;
       true -> 
-         X = str_to_float(string:trim(Line)),
+         X = str_to_ordinate(Line),
          [Interpolater | Receiver] = Pids,
          Interpolater ! {calculate, Receiver, Points, X},
-         fill_point(Points,Pids)
+         get_y(Points,Pids)
    end.
 
 fill_start_point(N, Max_N, Points, Pids) when N =:= Max_N -> 
    io:format("Points have been accepted\n"),
-   fill_point(Points, Pids);
+   get_y(Points, Pids);
+
 fill_start_point(N, Max_N, Points, Pids) ->
    Line = io:get_line(""),
    if 
       (Line =:= "stop\n") -> ok;
-      true -> 
-         Point_Tokens = string:tokens(Line, ";"),
-         [ X_String | Y_String ] = Point_Tokens,
-         X = str_to_float(X_String),
-         Y = str_to_float(string:trim(Y_String)),
-         io:format("The point is: ~f ~f~n",[X,Y]),
-         Point = create_point(X,Y),
+      true ->    
+         Point = str_to_point(Line),
+         io:format("The point is: ~f ~f~n",[x(Point),y(Point)]),
          fill_start_point(N + 1, Max_N,[Point | Points], Pids)
    end.
 

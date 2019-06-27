@@ -1,7 +1,7 @@
 -module(interpolation).
--export([interpolate/2, create_point/2]).
+-export([interpolate/2]).
+-import(point, [x/1, y/1]).
 
--include("point.hrl").
 interpolate(Points, X) -> 
     lists:foldl(
         fun (Point, Acc) -> 
@@ -16,7 +16,3 @@ base_polynomial(Points, X, NextPoint) ->
             Acc * ((X - x(Point)) / (x(NextPoint) - x(Point)))
         end, float(1), UpdatedList).
         
-
-x(Point) -> Point#point.x.
-y(Point) -> Point#point.y.
-create_point(X,Y) -> #point{x = X, y = Y}.
