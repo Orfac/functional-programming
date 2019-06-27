@@ -1,0 +1,2 @@
+erlc main.erl
+erl -noshell -s main main privet brat -s init stop
