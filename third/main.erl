@@ -26,8 +26,26 @@ listen_reciever() ->
          listen_reciever()
    end.
 
+
+fill_start_point([Points]) ->
+   Line = io:get_line(""),
+   if 
+      (Line =:= "stop\n") -> ok;
+      true -> 
+         Point_Tokens = string:tokens(Line, ";"),
+
+         
+X = 
+Y = 
+         Point = create_point(X,Y).
+         fill_start_point([Point | Points])
+   end.
+
+fill_point() ->
+   
+   ok.
+
 main(Args) ->
+   % Pidasdasd = spawn(fun listen_receiver/0)
    io:format("Args: ~p\n", [Args]),
-   Term = io:get_line(""),
-   Term2 = io:get_line(""),
-   io:format(Term), io:format(Term2).
+   fill_start_point([]).
