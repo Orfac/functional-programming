@@ -1,4 +1,4 @@
 erlc point.erl
 erlc interpolation.erl
 erlc main.erl
-erl -noshell -s main 1 7 2 brat -s init stop
+erl -noshell -s main main 1 7 2 brat -s init stop
