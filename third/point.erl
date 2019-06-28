@@ -1,5 +1,5 @@
 -module(point). 
--export([x/1, y/1, create_point/2, str_to_point/1, str_to_ordinate/1]).
+-export([x/1, y/1, create_point/2, str_to_point/1, str_to_float/1]).
 
 -record(point, {x, y}).
 
@@ -20,5 +20,3 @@ str_to_point(Str) ->
    Y = str_to_float(string:trim(Y_String)),
    create_point(X,Y).
 
-str_to_ordinate(Str) ->
-    str_to_float(string:trim(Str)).
