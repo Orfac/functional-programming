@@ -1,0 +1,4 @@
+-type user_name() :: atom().
+-type client() :: {pid(), user_name()}. % the tag() here is the unique tag
+-type clients() :: [client()].
+-type rooms() :: dict:dict(string(), clients()).
